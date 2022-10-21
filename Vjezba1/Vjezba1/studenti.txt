@@ -1,0 +1,4 @@
+Luka	Lukic	10
+Ante	Antic	15
+Lovre	Lovric	20
+Ana	Anic	18
