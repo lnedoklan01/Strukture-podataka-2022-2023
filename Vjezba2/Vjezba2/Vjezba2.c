@@ -17,7 +17,11 @@ typedef struct _Osoba{
 int UnosP(char* ime, char* prezime, int godina_rodenja, Pozicija P);
 void UnosOsobe(char* ime, char* prezime, int* godina_rodenja);
 void Ispis(Pozicija);
+void IspisUDat(Pozicija);
+void UpisIzDat(Pozicija);
 int UnosK(char* ime, char* prezime, int godina_rodenja, Pozicija p);
+int UnosNakon(char* ime, char* prezime, int godina_rodenja, Pozicija p);
+int Sortiraj(Pozicija Head);
 Pozicija Trazi(char*, Pozicija);
 Pozicija TraziPret(char* ime, char* prezime, int godina_rodenja, Pozicija P);
 
@@ -29,9 +33,11 @@ int main()
 	char prezime[MAX_SIZE];
 	int godina_rodenja;
 	int provjera;
+	char trazeno_prezime[MAX_SIZE];
 	Pozicija rezultat;
 
-
+	UpisIzDat(&Head);
+	Ispis(Head.Next);
 	UnosOsobe(ime, prezime, &godina_rodenja);
 	provjera = UnosP(ime, prezime, godina_rodenja, &Head);
 	UnosOsobe(ime, prezime, &godina_rodenja);
@@ -39,13 +45,20 @@ int main()
 	UnosOsobe(ime, prezime, &godina_rodenja);
 	provjera = UnosK(ime, prezime, godina_rodenja, &Head);
 	Ispis(Head.Next);
-	scanf("%s", prezime);
-	rezultat=Trazi(prezime, &Head);
-	//printf("%s %s %d\n", rezultat->ime, rezultat->prezime, rezultat->godina_rodenja);
+	scanf("%s", trazeno_prezime);
+	rezultat=Trazi(trazeno_prezime, &Head);
+	printf("%s %s %d\n", rezultat->ime, rezultat->prezime, rezultat->godina_rodenja);
 	provjera = Brisi(ime, prezime, godina_rodenja, &Head);
 	Ispis(Head.Next);
-
-	
+	scanf("%s %s %d", ime, prezime, &godina_rodenja);
+	provjera = UnosNakon(ime, prezime, godina_rodenja,trazeno_prezime,&Head);
+	Ispis(Head.Next);
+	scanf("%s", trazeno_prezime);
+	scanf("%s %s %d", ime, prezime, &godina_rodenja);
+	provjera = UnosPrije(ime, prezime, godina_rodenja, trazeno_prezime, &Head);
+	Ispis(Head.Next);
+	provjera = Sortiraj(&Head);
+	IspisUDat(Head.Next);
 
 }
 int UnosP(char *ime,char *prezime, int godina_rodenja, Pozicija p)
@@ -77,6 +90,30 @@ void Ispis(Pozicija p)
 	}
 	return;
 }
+void IspisUDat(Pozicija p)
+{
+	FILE* izl=fopen("studenti.txt", "w");
+	while (p != NULL)
+	{
+		fprintf(izl, "%s %s %d\n", p->ime, p->prezime, p->godina_rodenja);
+		p = p->Next;
+	}
+	return;
+}
+void UpisIzDat(Pozicija Head)
+{
+	FILE* ulaz = fopen("studenti.txt", "r");
+	char ime[MAX_SIZE];
+	char prezime[MAX_SIZE];
+	int godina_rodenja;
+	do {
+		Pozicija p = (Pozicija)malloc(sizeof(Osoba));
+		fscanf(ulaz, "%s %s %d\n", ime, prezime, &godina_rodenja);
+		UnosK(ime, prezime, godina_rodenja, Head);
+	} while (feof(ulaz) == 0);
+
+	return;
+}
 int UnosK(char* ime, char* prezime, int godina_rodenja, Pozicija p)
 {
 	Pozicija q;
@@ -100,7 +137,7 @@ Pozicija Trazi(char* prezime, Pozicija P)
 	}
 	return P;
 }
-Pozicija TraziPret(char* ime, char* prezime, int godina_rodenja, Pozicija P)
+Pozicija TraziPret( char* prezime, Pozicija P)
 {
 	Pozicija prev;
 	prev = P;
@@ -134,6 +171,57 @@ int Brisi(char* ime, char* prezime, int godina_rodenja, Pozicija p)
 		prev->Next = temp->Next;
 		free(temp);
 	}
-
+}
+int UnosNakon(char* ime, char* prezime, int godina_rodenja, char *prezime_prije,Pozicija Head)
+{
+	Pozicija q, p;
+	q = (Pozicija)malloc(sizeof(Osoba));
+	strcpy(q->ime, ime);
+	strcpy(q->prezime, prezime);
+	q->godina_rodenja = godina_rodenja;
+	p = Trazi(prezime_prije, Head);
+	q->Next = p->Next;
+	p->Next = q;
+	return -1;
+}
+int UnosPrije(char* ime, char* prezime, int godina_rodenja, char* prezime_nakon, Pozicija Head)
+{
+	Pozicija q, p;
+	q = (Pozicija)malloc(sizeof(Osoba));
+	strcpy(q->ime, ime);
+	strcpy(q->prezime, prezime);
+	q->godina_rodenja = godina_rodenja;
+	p = TraziPret(prezime_nakon, Head);
+	q->Next = p->Next;
+	p->Next = q;
+	return -1;
+}
+int Sortiraj(Pozicija Head)
+{
+	int zamjena=0;
+	Pozicija tren=Head->Next, prosli=Head, iduci=Head->Next->Next;
+	do
+	{
+		zamjena = 0;
+		tren = Head->Next;
+		prosli = Head;
+		iduci = Head->Next->Next;
+		while (tren->Next != NULL) {
+			if (strcmp(tren->prezime, iduci->prezime) > 0)
+			{
+				prosli->Next = iduci;
+				tren->Next = iduci->Next;
+				iduci->Next = tren;
+				prosli = iduci;
+				iduci = tren->Next;
+				zamjena = 1;
+			}
+			else {
+				prosli = tren;
+				tren = tren->Next;
+				iduci = tren->Next;
+			}
+		}
+	} while (zamjena);
 }
 
