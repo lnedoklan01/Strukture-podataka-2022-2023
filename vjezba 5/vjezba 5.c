@@ -14,7 +14,7 @@ void Provjera(char*, char*);
 void Push(pozicija, int);
 int Pop(pozicija);
 void rjesenje(pozicija, char*, int);
-int brisiSve(Pozicija);
+int brisiSve(pozicija);
 
 int main(){
     
@@ -23,7 +23,7 @@ int main(){
     head.next= NULL;
     char ime_dat[256];
     char* buffer = NULL; 
-    buffer = (char*)malloc(1000 * sizeof(char)); 
+    buffer = (char*)malloc(1024 * sizeof(char)); 
     
     printf("koju datoteku zelite otvoriti: ");
     scanf("%s", ime_dat);
@@ -46,7 +46,7 @@ void Provjera(char* ime_dat, char* buffer)
     }
     printf("postfix iz datoteke:");
     
-   fgets(buffer,1000,fp); 
+   fgets(buffer,1024,fp); 
 
 
     fclose(fp);
